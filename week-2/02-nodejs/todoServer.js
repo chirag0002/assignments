@@ -41,9 +41,109 @@
  */
   const express = require('express');
   const bodyParser = require('body-parser');
-  
   const app = express();
+  const port = 3000;
+  const fs = require('fs');
+  const todos = require('./todos.json');
   
   app.use(bodyParser.json());
+
+  app.get('/todos', function (req, res) {
+    res.status(200).json(todos);
+  })
+
+
+  app.get('/todos/:id', function (req, res) {
+    id = req.params.id;
+    if (id < 0) {
+      return res.status(404).json("Todo not found");
+    }
+    const todo = todos.find(todo => todo.id == id);
+    if (!todo) {
+      res.status(404).json("Not Found");
+    }
+    res.status(200).json(todo);
+  })
+
+
+  app.post('/todos', function (req, res) {
+    const { title, completed, description } = req.body;
+    if (!title || !description || typeof completed !== 'boolean' || typeof title !== 'string' || typeof description !== 'string') {
+      return res.status(400).json("Bad Request");
+    }
+    const todo ={
+      id: todos.length,
+      title: title,
+      completed: completed,
+      description: description
+    }
+    todos.push(todo);
+    fs.writeFile('./todos.json', JSON.stringify(todos, null, 2), (err) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json("Internal Server Error");
+      }
+  
+      console.log('Data written to file');
+      res.status(201).json(newTodo);
+    });
+    res.status(200).json("Successfully created");
+  })
+
+
+  app.put('/todos/:id', function (req, res) {
+    const id = req.params.id;
+    if (id < 0) {
+      return res.status(404).json("Todo not found");
+    }
+    const { title, completed, description } = req.body;
+    const todoToUpdate = todos.find(todo => todo.id == id);
+    if (!todoToUpdate) {
+      return res.status(404).json("Todo not found");
+    }
+    todoToUpdate.title = title || todoToUpdate.title;
+    todoToUpdate.completed = completed || todoToUpdate.completed;
+    todoToUpdate.description = description || todoToUpdate.description;
+    fs.writeFile('./todos.json', JSON.stringify(todos, null, 2), (err) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json("Internal Server Error");
+      }
+      console.log('Data written to file');
+      res.status(200).json(todoToUpdate);
+    });
+  });
+
+
+  app.delete('/todos/:id', function (req, res) {
+    const id = req.params.id;
+    if (id < 0) {
+      return res.status(404).json("Todo not found");
+    }
+    const todo = todos.find(todo => todo.id == id);
+    if (!todo) {
+      return res.status(404).json("Todo not found");
+    }
+    const todoIndex = todos.indexOf(todo); 
+    const deletedTodo = todos.splice(todoIndex, 1)[0];
+    fs.writeFile('./todos.json', JSON.stringify(todos, null, 2), (err) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json("Internal Server Error");
+      }
+      console.log('Data written to file');
+      res.status(200).json(deletedTodo);
+    });
+  });
+
+
+  app.all('*', function (req, res) {
+    res.status(404).send("Not Found");
+  })
+
+
+  app.listen(port, function () {
+    console.log(`Todo server listening on port ${port}!`);
+  });
   
   module.exports = app;
