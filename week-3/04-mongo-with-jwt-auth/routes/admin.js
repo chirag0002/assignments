@@ -6,6 +6,7 @@ const zod = require("zod");
 const router = Router();
 
 // Admin Routes
+<<<<<<< HEAD
 router.post('/signup', async(req, res) => {
     const {username, password} = req.body;
 
@@ -77,6 +78,22 @@ router.get('/courses', adminMiddleware, async(req, res) => {
         console.error(error);
         res.status(500).json({ message: 'Internal Server Error' });
     }
+=======
+router.post('/signup', (req, res) => {
+    // Implement admin signup logic
+});
+
+router.post('/signin', (req, res) => {
+    // Implement admin signup logic
+});
+
+router.post('/courses', adminMiddleware, (req, res) => {
+    // Implement course creation logic
+});
+
+router.get('/courses', adminMiddleware, (req, res) => {
+    // Implement fetching all courses logic
+>>>>>>> upstream/master
 });
 
 module.exports = router;

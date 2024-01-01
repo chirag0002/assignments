@@ -11,6 +11,7 @@ app.use(bodyParser.json());
 app.use("/admin", adminRouter)
 app.use("/user", userRouter)
 
+<<<<<<< HEAD
 app.all('*', (req, res) => {
     res.status(404).send({
         error: 'Not found'
@@ -24,6 +25,9 @@ app.use((err, req, res, next) => {
     });
 })
 
+=======
+const PORT = 3000;
+>>>>>>> upstream/master
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
